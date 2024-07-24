@@ -1,0 +1,75 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#define SIZE 5
+void initializeKeyTable(char keyTable[SIZE][SIZE]) {
+    char matrix[SIZE][SIZE] = {
+        {'M', 'F', 'H', 'I', 'J'},
+        {'K', 'U', 'N', 'O', 'P'},
+        {'Q', 'Z', 'V', 'W', 'X'},
+        {'Y', 'E', 'L', 'A', 'R'},
+        {'G', 'D', 'S', 'T', 'B'}
+    };
+    memcpy(keyTable, matrix, sizeof(matrix));
+}
+void findPosition(char keyTable[SIZE][SIZE], char ch, int pos[2]) {
+    if (ch == 'J') ch = 'I';
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            if (keyTable[i][j] == ch) {
+                pos[0] = i;
+                pos[1] = j;
+                return;
+            }
+        }
+    }
+}
+void encryptPair(char keyTable[SIZE][SIZE], char a, char b, char* out) {
+    int pos1[2], pos2[2];
+    findPosition(keyTable, a, pos1);
+    findPosition(keyTable, b, pos2);
+    if (pos1[0] == pos2[0]) {
+        out[0] = keyTable[pos1[0]][(pos1[1] + 1) % SIZE];
+        out[1] = keyTable[pos2[0]][(pos2[1] + 1) % SIZE];
+    } else if (pos1[1] == pos2[1]) {
+        out[0] = keyTable[(pos1[0] + 1) % SIZE][pos1[1]];
+        out[1] = keyTable[(pos2[0] + 1) % SIZE][pos2[1]];
+    } else {
+        out[0] = keyTable[pos1[0]][pos2[1]];
+        out[1] = keyTable[pos2[0]][pos1[1]];
+    }
+}
+void preprocessMessage(char* message, char* processed) {
+    int j = 0;
+    for (int i = 0; message[i]; i++) {
+        if (isalpha(message[i])) {
+            processed[j++] = toupper(message[i]);
+            if (i > 0 && processed[j-1] == processed[j-2]) {
+                processed[j++] = 'X';
+            }
+        }
+    }
+    if ((j % 2) != 0) processed[j++] = 'X';
+    processed[j] = '\0';
+}
+void encryptMessage(char keyTable[SIZE][SIZE], char* message, char* encrypted) {
+    char preprocessed[100];
+    preprocessMessage(message, preprocessed);
+    int len = strlen(preprocessed);
+    for (int i = 0; i < len; i += 2) {
+        encryptPair(keyTable, preprocessed[i], preprocessed[i + 1], encrypted + i);
+    }
+    encrypted[len] = '\0';
+}
+int main() {
+    char keyTable[SIZE][SIZE];
+    char message[] = "Must see you over Cadogan West. Coming at once.";
+    char encrypted[100];
+    initializeKeyTable(keyTable);
+    encryptMessage(keyTable, message, encrypted);
+    printf("Encrypted Message: %s\n", encrypted);
+    return 0;
+}
+
+OUTPUT:
+Encrypted Message: FKTBDLRZAKNPZLYLETKTLOZATBTNFJKSTIPOUA

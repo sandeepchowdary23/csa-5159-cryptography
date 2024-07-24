@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <string.h>
+#define CIPHERTEXT "53‡‡†305))6*;4826)4‡.)4‡);806*;48†8¶60))85;;]8*;:‡*8†83(88)5*†;46(;88*96*?;8)*‡(;485);5*†2:*‡(;4956*2(5*—4)8¶8*;4069285);)6†8)4‡‡;1(‡9;48081;8:8‡1;48†85;4)485†528806*81(‡9;48;(88;4(‡?34;48)4‡;161;:188;‡?"
+void frequency_analysis(const char *text, int freq[256]) {
+    for (int i = 0; text[i] != '\0'; i++) {
+        freq[(unsigned char)text[i]]++;
+    }
+}
+char guess_char(int freq[256], char most_likely) {
+    int max_freq = 0;
+    char guessed_char = 0;
+    for (int i = 0; i < 256; i++) {
+        if (freq[i] > max_freq) {
+            max_freq = freq[i];
+            guessed_char = (char)i;
+        }
+    }
+    return guessed_char;
+}
+void replace_char(char *text, char from, char to) {
+    for (int i = 0; text[i] != '\0'; i++) {
+        if (text[i] == from) {
+            text[i] = to;
+        }
+    }
+}
+void decrypt(char *ciphertext) {
+    int freq[256] = {0};
+    frequency_analysis(ciphertext, freq);
+    char e = guess_char(freq, 'e');
+    replace_char(ciphertext, e, 'e');
+    freq[(unsigned char)e] = 0;
+    char t = guess_char(freq, 't');
+    replace_char(ciphertext, t, 't');
+    freq[(unsigned char)t] = 0;
+    char h = guess_char(freq, 'h');
+    replace_char(ciphertext, h, 'h');
+    replace_char(ciphertext, '†', 'a');
+    replace_char(ciphertext, '‡', 'e');
+    replace_char(ciphertext, '¶', 'i');
+    replace_char(ciphertext, '(', 'o');
+    replace_char(ciphertext, ')', 'n');
+    replace_char(ciphertext, '8', 's');
+    replace_char(ciphertext, '4', 'r');
+    replace_char(ciphertext, '5', 'd');
+    replace_char(ciphertext, '6', 'l');
+    replace_char(ciphertext, '0', 'm');
+    replace_char(ciphertext, '1', 'y');
+    replace_char(ciphertext, '9', 'u');
+    replace_char(ciphertext, '2', 'v');
+    replace_char(ciphertext, '3', 'c');
+    replace_char(ciphertext, '‡', 'e');
+    replace_char(ciphertext, '†', 'a');
+    replace_char(ciphertext, '(', 'o');
+    replace_char(ciphertext, ')', 'n');
+    replace_char(ciphertext, '8', 's');
+    replace_char(ciphertext, '4', 'r');
+    replace_char(ciphertext, '5', 'd');
+    replace_char(ciphertext, '6', 'l');
+    replace_char(ciphertext, '0', 'm');
+    replace_char(ciphertext, '1', 'y');
+    replace_char(ciphertext, '9', 'u');
+    replace_char(ciphertext, '2', 'v');
+    replace_char(ciphertext, '3', 'c');
+    printf("Decrypted message: %s\n", ciphertext);
+}
+int main() {
+    char ciphertext[] = CIPHERTEXT;
+    decrypt(ciphertext);
+    return 0;
+}
+
+OUTPUT:
+Decrypted message: dcΓheΓheΓhacmdnnl*trevlnrΓhe.nrΓhenteml*treΓhae┬ilmnnedtt]e*t:Γhe*eΓhaecoeend*Γhatrlotee*ul*?ten*Γheotredntd*Γhav:*Γheotrudl*vod*Γhörne┬ie*trmluvedntnlΓhaenrΓheΓhetyoΓheutremeyte:eΓheytreΓhaedtrnredΓhadveeml*eyoΓheutretoeetroΓhe?crtrenrΓhetylyt:yeetΓhe?
