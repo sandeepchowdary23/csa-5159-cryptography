@@ -1,0 +1,35 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+void encrypt(char* text, char* key, char* encryptedText) {
+    int textLen = strlen(text);
+    int keyLen = strlen(key);
+    for (int i = 0, j = 0; i < textLen; i++) {
+        char c = text[i];
+        if (isalpha(c)) {
+            char offset = islower(c) ? 'a' : 'A';
+            c = (c - offset + (tolower(key[j % keyLen]) - 'a')) % 26 + offset;
+            j++;
+        }
+        encryptedText[i] = c;
+    }
+    encryptedText[textLen] = '\0';
+}
+int main() {
+    char text[100], key[100], encryptedText[100];
+    printf("Enter the text to be encrypted: ");
+    fgets(text, sizeof(text), stdin);
+    text[strcspn(text, "\n")] = 0;
+    printf("Enter the key: ");
+    fgets(key, sizeof(key), stdin);
+    key[strcspn(key, "\n")] = 0;
+    for (int i = 0; key[i]; i++) key[i] = tolower(key[i]);
+    encrypt(text, key, encryptedText);
+    printf("Encrypted text: %s\n", encryptedText);
+    return 0;
+}
+
+OUTPUT:
+Enter the text to be encrypted: VENKY
+Enter the key: WE
+Encrypted text: RIJOU

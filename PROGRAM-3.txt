@@ -1,0 +1,73 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#define SIZE 5
+void createKeyMatrix(char key[], char keyMatrix[SIZE][SIZE]) {
+    int dict[26] = {0}, x = 0, y = 0;
+    for (int i = 0; key[i] && x < SIZE; i++) {
+        if (key[i] != 'j' && !dict[key[i] - 'a']) {
+            keyMatrix[x][y++] = key[i];
+            dict[key[i] - 'a'] = 1;
+            if (y == SIZE) y = 0, x++;
+        }
+    }
+    for (char c = 'a'; c <= 'z' && x < SIZE; c++) {
+        if (c != 'j' && !dict[c - 'a']) {
+            keyMatrix[x][y++] = c;
+            if (y == SIZE) y = 0, x++;
+        }
+    }
+}
+void findPosition(char keyMatrix[SIZE][SIZE], char c, int *row, int *col) {
+    for (int i = 0; i < SIZE; i++)
+        for (int j = 0; j < SIZE; j++)
+            if (keyMatrix[i][j] == c) {
+                *row = i;
+                *col = j;
+                return;
+            }
+}
+void encryptPair(char keyMatrix[SIZE][SIZE], char a, char b, char* result) {
+    int row1, col1, row2, col2;
+    findPosition(keyMatrix, a, &row1, &col1);
+    findPosition(keyMatrix, b, &row2, &col2);
+    if (row1 == row2) {
+        result[0] = keyMatrix[row1][(col1 + 1) % SIZE];
+        result[1] = keyMatrix[row2][(col2 + 1) % SIZE];
+    } else if (col1 == col2) {
+        result[0] = keyMatrix[(row1 + 1) % SIZE][col1];
+        result[1] = keyMatrix[(row2 + 1) % SIZE][col2];
+    } else {
+        result[0] = keyMatrix[row1][col2];
+        result[1] = keyMatrix[row2][col1];
+    }
+}
+void encryptText(char keyMatrix[SIZE][SIZE], char* text, char* encryptedText) {
+    for (int i = 0; text[i]; i += 2) {
+        if (!text[i + 1]) text[i + 1] = 'x';
+        encryptPair(keyMatrix, text[i], text[i + 1], &encryptedText[i]);
+    }
+}
+int main() {
+    char key[26], text[100], encryptedText[100] = {0};
+    char keyMatrix[SIZE][SIZE];
+
+    printf("Enter the key: ");
+    scanf("%s", key);
+    for (int i = 0; key[i]; i++) key[i] = tolower(key[i]);
+
+    printf("Enter the text to be encrypted: ");
+    scanf("%s", text);
+    for (int i = 0; text[i]; i++) text[i] = tolower(text[i]);
+
+    createKeyMatrix(key, keyMatrix);
+    encryptText(keyMatrix, text, encryptedText);
+
+    printf("Encrypted text: %s\n", encryptedText);
+    return 0;
+}
+
+OUTPUT:
+Enter the key: KEY
+Enter the text to be encrypted: LOCKED
+Encrypted text: miicdl
